@@ -13,7 +13,7 @@ if not os.path.exists(PICKLE_FILE):
     if os.path.exists(CSV_FILE):
         df_csv = pd.read_csv(CSV_FILE)
         df_csv.to_pickle(PICKLE_FILE)
-        print("CSV ditemukan. Konversi ke Pickle berhasil.")
+        print("CSV file found. Successfully converted to pickle.")
     else:
         columns = [
             "market_id", "created_at", "actual_delivery_time", "store_id",
@@ -22,18 +22,15 @@ if not os.path.exists(PICKLE_FILE):
             "total_onshift_partners", "total_busy_partners", "total_outstanding_orders"
         ]
         pd.DataFrame(columns=columns).to_pickle(PICKLE_FILE)
-        print("File Pickle baru berhasil dibuat.")
+        print("New pickle file created with predefined columns.")
 
 @app.route('/api/insert', methods=['POST'])
 def insert_data():
     try:
         data = request.get_json()
-
         df = pd.read_pickle(PICKLE_FILE)
-
         new_df = pd.DataFrame([data])
         df = pd.concat([df, new_df], ignore_index=True)
-
         df.to_pickle(PICKLE_FILE)
 
         return jsonify({"message": "Data inserted successfully"}), 200
