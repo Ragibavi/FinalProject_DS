@@ -5,10 +5,9 @@ import altair as alt
 
 API_URL = "http://192.168.100.173:8888"
 
-
-
 st.set_page_config(page_title="Food Delivery Data Viewer", layout="wide")
-st.title("Stored Data")
+st.title("Stored Data Viewer")
+
 
 def clean_dataframe(data):
     df = pd.DataFrame(data)
@@ -40,6 +39,24 @@ try:
             if 'actual_delivery_time' in df.columns:
                 df['actual_delivery_time'] = pd.to_datetime(df['actual_delivery_time'], errors='coerce')
 
+            # Date range filter
+            if not df['created_at'].isnull().all():
+                min_date = df['created_at'].min().date()
+                max_date = df['created_at'].max().date()
+
+                start_date, end_date = st.date_input(
+                    "Filter by Created Date Range:",
+                    value=(min_date, max_date),
+                    min_value=min_date,
+                    max_value=max_date
+                )
+
+                df = df[
+                    (df['created_at'].dt.date >= start_date) &
+                    (df['created_at'].dt.date <= end_date)
+                ]
+
+            # Search filter
             search_query = st.text_input("Search by Store ID, Category, or Market ID")
             if search_query:
                 df = df[
