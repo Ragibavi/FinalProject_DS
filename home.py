@@ -3,7 +3,7 @@ import requests
 import pandas as pd
 import altair as alt
 
-API_URL = "http://192.168.100.173:8888"
+API_URL = "http://192.168.100.170:8888"
 
 st.set_page_config(page_title="Food Delivery Data Viewer", layout="wide")
 st.title("Stored Data Viewer")
