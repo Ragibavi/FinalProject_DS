@@ -19,15 +19,35 @@ def home():
 
 @app.route("/data", methods=["GET"])
 def get_all_data():
+    """
+    GET /data
+    Optional query params:
+        limit   : int  -> number of rows to return (e.g. /data?limit=100)
+                   0   -> return ALL rows
+        preview : bool -> alias for limit=100 when preview=true
+    """
     try:
         if not os.path.exists(DATA_PATH):
             return jsonify({"error": "Dataset file not found."}), 404
 
         df = pd.read_csv(DATA_PATH)
-        data_preview = df.head(100).to_dict(orient="records")
-        return jsonify(data_preview)
+
+        limit   = request.args.get("limit", default=None, type=int)
+        preview = request.args.get("preview", default=None, type=str)
+
+        if preview and preview.lower() in {"true", "1", "yes"}:
+            limit = 100
+
+        if limit and limit > 0:
+            data_out = df.head(limit)
+        else:
+            data_out = df
+
+        return jsonify(data_out.to_dict(orient="records"))
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/predict", methods=["POST"])
 def predict():
